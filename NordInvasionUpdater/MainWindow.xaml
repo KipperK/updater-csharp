@@ -6,12 +6,15 @@
         xmlns:local="clr-namespace:NordInvasionUpdater"
         mc:Ignorable="d"
         Title="NordInvasion Updater"
-        Height="340" Width="340"
+        SizeToContent="WidthAndHeight"
         ResizeMode="CanMinimize">
     <DockPanel>
         <Menu DockPanel.Dock="Top">
             <MenuItem Header="_File">
                 <MenuItem Header="E_xit" />
+            </MenuItem>
+            <MenuItem Header="_Debug">
+                <MenuItem Header="_Run Test" Click="RunTest"/>
             </MenuItem>
             <MenuItem Header="_Help">
                 <MenuItem Header="_About" />
@@ -20,7 +23,7 @@
         <StatusBar DockPanel.Dock="Bottom" Height="20" Background="Red">
 
         </StatusBar>
-        <Grid>
+        <Grid Height="275" Width="340">
             <Grid.Background>
                 <ImageBrush ImageSource="Resources/Images/background.bmp" Stretch="UniformToFill"/>
             </Grid.Background>
