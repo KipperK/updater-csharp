@@ -27,16 +27,29 @@ namespace NordInvasionUpdater
     public partial class MainWindow : Window
     {
         // Configurations
-        protected string masterIndexAddress = "";
-        protected string settingsRegistryKeyPath = @"SOFTWARE\NordInvasionUpdater";
+        protected string masterIndexAddress { get; } = @"http://odin.nordinvasion.com/mod/updater.php";
+        protected string settingsRegistryKeyPath { get; } = @"SOFTWARE\NordInvasionUpdater";
         // End Configuration
 
-        BackgroundWorker downloadWorker = new BackgroundWorker();
+        List<Module> modules;
+        string versionAvailable;
+
+        BackgroundWorker initModulesWorker = new BackgroundWorker();
         BackgroundWorker hashWorker = new BackgroundWorker();
+        class initModulesWorker_Result
+        {
+            public string version { get; set; }
+            public List<Module> modules { get; set; }
+        }
 
         public MainWindow()
         {
             InitializeComponent();
+            initModulesWorker.WorkerReportsProgress = false;
+            initModulesWorker.WorkerSupportsCancellation = false;
+            initModulesWorker.DoWork += new DoWorkEventHandler(InitModules_DoWork);
+            initModulesWorker.RunWorkerCompleted += new RunWorkerCompletedEventHandler(InitModules_RunWorkerCompleted);
+            initModulesWorker.RunWorkerAsync();
         }
 
         private void RunTest(object sender, RoutedEventArgs e)
@@ -44,10 +57,36 @@ namespace NordInvasionUpdater
             
         }
 
-        public void LoadMasterIndex()
+        private void InitModules_DoWork(object sender, DoWorkEventArgs args)
         {
-            string response = Helpers.DownloadToString(masterIndexAddress);
-            List<Module> modules = JsonConvert.DeserializeObject<List<Module>>(response);
+            BackgroundWorker worker = sender as BackgroundWorker;
+            //try
+            //{
+                string response = Helpers.DownloadToString(masterIndexAddress);
+                args.Result = JsonConvert.DeserializeObject<initModulesWorker_Result>(response);
+            //}
+            //catch (WebException e) //when (e.Status == WebExceptionStatus.ProtocolError)
+            //{
+            //    using (var response = e.Response as HttpWebResponse)
+            //    {
+            //        int statusCode = response != null ? (int)response.StatusCode : 0;
+            //    }
+            //}
+        }
+
+        private void InitModules_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs args)
+        {
+            if (args.Error != null)
+            {
+                MessageBox.Show(args.Error.Message);
+            }
+            else
+            {
+                initModulesWorker_Result result = args.Result as initModulesWorker_Result;
+                this.modules = result.modules;
+                this.versionAvailable = result.version;
+                MessageBox.Show("Success: "+this.modules.Count);
+            }
         }
 
         public void SetSelectedWarbandPath(string value)

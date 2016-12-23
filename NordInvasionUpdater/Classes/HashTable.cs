@@ -16,7 +16,7 @@ namespace NordInvasionUpdater
     class HashNode
     {
         public string name { get; set; }
-        public string path {get; set; }
+        public string path { get; set; }
         public string hash { get; set; }
         public List<HashNode> children { get; set; }
     }

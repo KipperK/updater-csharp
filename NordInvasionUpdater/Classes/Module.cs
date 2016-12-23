@@ -4,29 +4,44 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 
 namespace NordInvasionUpdater
 {
     class Module
     {
-        private string name;
-        private List<string> addresses;
+        public string name { get; }
+        private string path { get; }
+        public List<string> addresses { get; }
+        public List<HashTable> hashTables { get; } = new List<HashTable>();
 
-        private List<HashTable> hashTables = new List<HashTable>();
-        private string path;
-
-        public Module(string name, List<string> addresses)
+        public Module(string name, string path, List<string> addresses)
         {
             this.name = name;
+            this.path = path;
             this.addresses = addresses;
+
+            MessageBox.Show("Module: "+this.name);
 
             for (int i = 0; i < addresses.Count; i++)
             {
-                string response = Helpers.DownloadToString(addresses[i]);
-                HashTable table = JsonConvert.DeserializeObject<HashTable>(response);
-                this.hashTables.Add(table);
+                try
+                {
+                    string response = Helpers.DownloadToString(addresses[i]);
+                    HashTable table = JsonConvert.DeserializeObject<HashTable>(response);
+                    this.hashTables.Add(table);
+                }
+                catch (WebException e)
+                {
+                    // Log web exception
+                }
+                catch (Exception e)
+                {
+
+                }
             }
         }
     }

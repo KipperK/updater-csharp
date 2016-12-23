@@ -37,7 +37,6 @@ namespace NordInvasionUpdater.Classes
             }
         }
 
-
         /// <summary>
         /// Compare two version strings.
         /// </summary>
